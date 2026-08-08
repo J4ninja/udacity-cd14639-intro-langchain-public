@@ -1,4 +1,3 @@
-from langchain_core.messages import BaseMessage
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any, Literal, TypedDict
 from datetime import datetime
@@ -17,9 +16,11 @@ class DocumentChunk(BaseModel):
 # Refer to README.md Task 1.1 for detailed field requirements.
 class AnswerResponse(BaseModel):
     """Structured response for Q&A tasks - TO BE IMPLEMENTED"""
-    pass
-
-
+    question: str = Field(description="Original user question")
+    answer: str = Field(description="Generated answer")
+    sources: list[str] = Field(description="List of source doc Ids")
+    confidence: float = Field(default=0, ge=0, le=1, description="Confidence score")
+    timestamp: datetime = Field(default_factory=datetime.now)
 
 class SummarizationResponse(BaseModel):
     """Structured response for summarization tasks"""
@@ -50,8 +51,9 @@ class UpdateMemoryResponse(BaseModel):
 # Refer to README.md Task 1.2 for detailed field requirements.
 class UserIntent(BaseModel):
     """User intent classification - TO BE IMPLEMENTED"""
-    pass
-
+    intent_type: Literal["qa", "summarization", "calculation", "unknown"] = Field(description="The classified intent")
+    confidence: float = Field(ge=0, le=1, description="Confidence in classification")
+    reasoning: str = Field(description="Explanation for the classification")
 
 class SessionState(BaseModel):
     """Session state"""

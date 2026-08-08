@@ -1,5 +1,5 @@
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain.prompts.chat import SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts.chat import SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 
 def get_intent_classification_prompt() -> PromptTemplate:
@@ -62,7 +62,26 @@ Guidelines:
 
 # Calculation System Prompt
 # TODO: Implement the CALCULATION_SYSTEM_PROMPT. Refer to README.md Task 3.2 for details
-CALCULATION_SYSTEM_PROMPT = """"""
+CALCULATION_SYSTEM_PROMPT = """You are an expert calculation assistant for documents (financial, healthcare, and related domains).
+
+Your capabilities:
+- Perform numeric calculations and unit conversions accurately.
+- Extract numeric values from referenced documents and cite document IDs when used.
+- Show clear, step-by-step reasoning and provide a concise final numeric result.
+
+Required behavior:
+1. Determine which document(s) (if any) are needed to answer the user; always retrieve documents using the `document_search` or document reader tool before using values from files.
+2. Determine the exact mathematical expression to compute based on the user's input and the retrieved document values.
+3. For every computation, without exception, call the `calculate` tool to evaluate the expression. Do not perform arithmetic directly in the chat response.
+4. When calling `calculate`, include only the sanitized mathematical expression (numbers, operators, parentheses).
+5. After the `calculate` tool returns, present:
+    - a brief restatement of the expression and any assumptions,
+    - the step-by-step reasoning (summarized),
+    - the final numeric result with units and source citations.
+6. If required numeric values are missing from documents, ask a focused clarifying question rather than guessing.
+
+Maintain a concise, professional tone.
+"""
 
 
 # TODO: Finish the function to return the correct prompt based on intent type
@@ -73,10 +92,11 @@ def get_chat_prompt_template(intent_type: str) -> ChatPromptTemplate:
     """
     if intent_type == "qa":
         system_prompt = QA_SYSTEM_PROMPT
-    elif intent_type ==  # TODO:  Check the intent type value
-        system_prompt =  # TODO: Set system prompt to the correct value based on intent type
-    elif intent_type ==  # TODO: Check the intent type value
+    elif intent_type ==  "summarization": 
+        system_prompt =  SUMMARIZATION_SYSTEM_PROMPT # TODO: Set system prompt to the correct value based on intent type
+    elif intent_type ==  "calculation": # TODO: Check the intent type value
     # TODO: Set system prompt to the correct value based on intent type
+        system_prompt = CALCULATION_SYSTEM_PROMPT
     else:
         system_prompt = QA_SYSTEM_PROMPT  # Default fallback
 

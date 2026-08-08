@@ -66,9 +66,35 @@ def create_calculator_tool(logger: ToolLogger):
     """
     Creates a calculator tool - TO BE IMPLEMENTED
     """
-    # Your implementation here
-    pass
+    allowed_re = re.compile(r"^[0-9\s+\-*/().%]+$")
 
+    @tool
+    def calculate(expression: str) -> str:
+        """Safely evaluate a basic mathematical expression.
+
+        Only digits, whitespace, and operators + - * / % ( ) . are allowed.
+        """
+        expr = str(expression).strip()
+        if not allowed_re.fullmatch(expr):
+            error_msg = "Expression contains disallowed characters. Only digits and basic operators are allowed."
+            logger.log_tool_use("calculate", {"expression": expression}, {"error": error_msg})
+            return error_msg
+
+        try:
+            # Evaluate in a restricted namespace
+            result = eval(expr, {"__builtins__": None}, {})
+            logger.log_tool_use(
+                tool_name="calculate",
+                input_data={"expression": expression},
+                output={"result": result}
+            )
+            return f"{result}"
+        except Exception as e:
+            error_msg = f"Error evaluating expression: {str(e)}"
+            logger.log_tool_use("calculate", {"expression": expression}, {"error": error_msg})
+            return error_msg
+
+    return calculate
 
 def create_document_search_tool(retriever, logger: ToolLogger):
     """
