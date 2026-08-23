@@ -16,12 +16,46 @@ Given the user input and conversation history, classify the user's intent into o
 - calculation: Mathematical operations or numerical computations. Or questions about documents that may require calculations
 - unknown: Cannot determine the intent clearly
 
+Category examples:
+- qa examples:
+    - "What is the policy effective date?"
+    - "Who signed contract C-44 and when was it signed?"
+    - "Which invoice has the highest amount this month?" (comparison question that does not ask for arithmetic)
+- summarization examples:
+    - "Summarize the key points of the annual report."
+    - "Give me a short summary of the latest claim report."
+    - "Extract the main points from these medical billing notes."
+- calculation examples:
+    - "What was the total revenue in Q3?"
+    - "What is 12.5% of the invoice total?"
+    - "Add the amounts from INV-100 and INV-101."
+- unknown examples:
+    - "Can you help me with this?" (ambiguous, no clear task)
+    - "Tell me something interesting." (not tied to qa/summarization/calculation)
+    - "Do it again." (missing context about what to do)
+
+Confidence scoring instructions:
+- Return a confidence score from 0.0 to 1.0.
+- Use 0.9-1.0 when intent is explicit and unambiguous.
+- Use 0.7-0.89 when likely intent is clear but wording is partially ambiguous.
+- Use 0.4-0.69 when multiple intents are plausible.
+- Use 0.0-0.39 when there is not enough information; prefer `unknown`.
+- For ambiguous requests, choose the most likely intent only if evidence is meaningful; otherwise choose `unknown` with lower confidence.
+
+Reasoning instructions:
+- Provide concise reasoning (1-2 sentences).
+- Cite the exact cues from user wording and/or conversation history.
+- If you choose `unknown`, explicitly state what information is missing.
+
 User Input: {user_input}
 
 Recent Conversation History:
 {conversation_history}
 
-Analyze the user's request and classify their intent with a confidence score and brief reasoning.
+Analyze the user's request and classify intent with fields:
+- intent_type: one of qa, summarization, calculation, unknown
+- confidence: float between 0.0 and 1.0
+- reasoning: brief explanation following the instructions above
 """
     )
 
